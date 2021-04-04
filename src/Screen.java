@@ -5,12 +5,16 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import javax.imageio.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.JPanel;
 
-public class Screen extends JPanel implements Runnable, KeyListener 
+public class Screen<BufferedImageLoader> extends JPanel implements Runnable, KeyListener 
 {
 	private static final long serialVersionUID = 1L; //used during the deserialization of an object to ensure that a loaded class is compatible with the serialized object
 
@@ -27,6 +31,9 @@ public class Screen extends JPanel implements Runnable, KeyListener
     private ArrayList<Apple> apples; // a bunch of apples
 
     private Random r; // variable for random calculations
+    
+    private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+
 
     private int xCoor = 10, yCoor = 10; // setting initial start coordinates for snake
     private int size = 5; // amount of body parts of snake initially
@@ -37,7 +44,15 @@ public class Screen extends JPanel implements Runnable, KeyListener
 
     public Screen() { // Screen constructor
         setFocusable(true); // making sure the component is focusable
-
+        
+        
+        try {
+        	image = ImageIO.read(new File("snakeBground.jpg"));
+        }
+        catch(IOException e)
+        {
+        }
+        
         addKeyListener(this); // to start receiving user input from the keyboard
         setPreferredSize(new Dimension(WIDTH, HEIGHT)); // setting the size of the screen
 
@@ -50,6 +65,7 @@ public class Screen extends JPanel implements Runnable, KeyListener
     }
 
     public void tick() { // tick method
+
         if (snake.size() == 0) {
             b = new BodyPart(xCoor, yCoor, 22); // creates snake
             snake.add(b); // adds it to snake arrayList
@@ -104,6 +120,7 @@ public class Screen extends JPanel implements Runnable, KeyListener
                 snake.remove(0);
             }
         }
+
     }
 
     public void paint(Graphics g) { // graphic design of the GUI
@@ -134,15 +151,15 @@ public class Screen extends JPanel implements Runnable, KeyListener
         	g.fillRect(0, 0, WIDTH, HEIGHT);
         	g.setColor(Color.BLACK);
         	
-        	g.setColor(Color.RED);	//add text for game over and score for the end of the game and set their colors, size and position
-        	g.setFont(new Font ("Ink Free", Font.BOLD, 85));
+        	g.setColor(Color.ORANGE);	//add text for game over and score for the end of the game and set their colors, size and position
+        	g.setFont(new Font ("Times New Roman", Font.BOLD, 85));
         	FontMetrics metrics = getFontMetrics(g.getFont());
         	g.drawString("GAME OVER", (WIDTH - metrics.stringWidth("GAME OVER"))/2, 220);
-        	g.setFont(new Font ("Ink Free", Font.BOLD, 75));
+        	g.setFont(new Font ("Times New Roman", Font.BOLD, 75));
         	g.drawString("Score: " + applesEaten, (WIDTH - metrics.stringWidth("Score: " + applesEaten))/2, 300);
         	
-        }
-
+        
+        }	
     }
 
     public void start() {	//start the game
@@ -159,7 +176,6 @@ public class Screen extends JPanel implements Runnable, KeyListener
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
     }
     
 
@@ -193,8 +209,11 @@ public class Screen extends JPanel implements Runnable, KeyListener
             right = false;
             down = true;
         }
+        if(key == KeyEvent.VK_M)  // inserting a key to stop the console from running
+        {
+        	System.exit(0);
+        }
     }
-
     @Override
     public void keyReleased(KeyEvent arg0) {
     }

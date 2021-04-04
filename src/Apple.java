@@ -1,3 +1,4 @@
+
 import java.awt.Color;
 import java.awt.Graphics;
 
@@ -16,10 +17,11 @@ public class Apple
 
     }
 
-    public void draw(Graphics g) { // Graphics class to set the apple to be round and to fill the apple with red color
-        g.setColor(Color.RED);
+    public void draw(Graphics g) { // Graphics class to set the apple to be round and to fill the apple with green color
+        g.setColor(Color.green);
         g.fillOval(xCoor * width, yCoor * height, width, height);
     }
+    
 
     // getters and setters for x and y coordinates
     public int getxCoor() {
