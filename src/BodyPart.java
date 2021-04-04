@@ -5,12 +5,14 @@ public class BodyPart
 {
 
     private int xCoor, yCoor, width, height; // x and y coordinates, width and height of bodyPart of snake
+	private boolean raised;
 
     public BodyPart(int xCoor, int yCoor, int tileSize) { // constructor to initialize the x and y coordinates and the tile size
         this.xCoor = xCoor;
         this.yCoor = yCoor;
         width = tileSize;
         height = tileSize;
+        raised = true;
     }
 
     public void tick() { // the speed of the snake
@@ -18,9 +20,9 @@ public class BodyPart
     }
 
     public void draw(Graphics g) { // Graphics class to set and fill color to the snake
-        g.setColor(Color.GREEN);
-        g.fillRect(xCoor * width, yCoor * height, width, height);
-        //g.setColor(Color.GREEN);
+        g.setColor(Color.cyan);
+        g.fill3DRect(xCoor * width, yCoor * height, width, height, raised);
+        //g.setColor(Color.cyan);
         //g.fillRect(xCoor * width + 2, yCoor * height + 2, width -4, height-4);
     }
 
