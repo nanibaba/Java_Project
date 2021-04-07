@@ -18,7 +18,7 @@ public class Apple
     }
 
     public void draw(Graphics g) { // Graphics class to set the apple to be round and to fill the apple with green color
-        g.setColor(Color.green);
+        g.setColor(new Color(186, 60, 60));
         g.fillOval(xCoor * width, yCoor * height, width, height);
     }
     

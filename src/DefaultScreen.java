@@ -1,8 +1,4 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.imageio.*;
@@ -11,10 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.swing.*;
 
-import javax.swing.JPanel;
-
-public class Screen<BufferedImageLoader> extends JPanel implements Runnable, KeyListener 
+public class DefaultScreen<BufferedImageLoader> extends JPanel implements Runnable, KeyListener
 {
 	private static final long serialVersionUID = 1L; //used during the deserialization of an object to ensure that a loaded class is compatible with the serialized object
 
@@ -42,10 +37,9 @@ public class Screen<BufferedImageLoader> extends JPanel implements Runnable, Key
 
     private int ticks = 0; // ticks for the speed of the snake
 
-    public Screen() { // Screen constructor
+    public DefaultScreen() { // Screen constructor
         setFocusable(true); // making sure the component is focusable
-        
-        
+
         try {
         	image = ImageIO.read(new File("snakeBground.jpg"));
         }
@@ -102,7 +96,6 @@ public class Screen<BufferedImageLoader> extends JPanel implements Runnable, Key
             stop();
         }
 
-
         ticks++;
 
         if (ticks > 800000) { // define the speed of the snake and the direction
@@ -127,10 +120,8 @@ public class Screen<BufferedImageLoader> extends JPanel implements Runnable, Key
         if (running) {
         	
         	g.clearRect(0, 0, WIDTH, HEIGHT);	//set the screen graphics and color
-        	g.setColor(Color.BLACK);
+        	g.setColor(new Color(0, 102, 0));
         	g.fillRect(0, 0, WIDTH, HEIGHT);
-
-        	g.setColor(Color.BLACK);
 
         	for (int i = 0; i < snake.size(); i++) {	//set the snake graphics
         		snake.get(i).draw(g);
@@ -139,26 +130,39 @@ public class Screen<BufferedImageLoader> extends JPanel implements Runnable, Key
         		apples.get(i).draw(g);
         	}
         	
-        	g.setColor(Color.RED);	// add a score and set its color, position and size
-        	g.setFont(new Font ("Ink Free", Font.BOLD, 15));
+        	g.setColor(new Color(144, 1, 1));	// add a score and set its color, position and size
+        	g.setFont(new Font ("Roboto Thin", Font.BOLD, 13));
         	FontMetrics metrics = getFontMetrics(g.getFont());
         	g.drawString("SCORE: " + applesEaten, (WIDTH - metrics.stringWidth("SCORE: " + applesEaten))/2, 20);
         }
         
-        else if (!running) {
-        	
+        else {
+            Graphics g2d = (Graphics2D) g;
+
         	g.clearRect(0, 0, WIDTH, HEIGHT);	//set the screen to be black when the game is over
         	g.fillRect(0, 0, WIDTH, HEIGHT);
         	g.setColor(Color.BLACK);
         	
-        	g.setColor(Color.ORANGE);	//add text for game over and score for the end of the game and set their colors, size and position
+        	g.setColor(new Color(144, 1, 1));	//add text for game over and score for the end of the game and set their colors, size and position
         	g.setFont(new Font ("Times New Roman", Font.BOLD, 85));
         	FontMetrics metrics = getFontMetrics(g.getFont());
         	g.drawString("GAME OVER", (WIDTH - metrics.stringWidth("GAME OVER"))/2, 220);
         	g.setFont(new Font ("Times New Roman", Font.BOLD, 75));
         	g.drawString("Score: " + applesEaten, (WIDTH - metrics.stringWidth("Score: " + applesEaten))/2, 300);
-        	
-        
+
+            Rectangle play = new Rectangle(WIDTH/4, 370, 290, 50);
+
+            g.setFont(new Font("Roboto Thin", Font.BOLD,20));
+            FontMetrics newMetrics = getFontMetrics(g.getFont());
+
+            g.setColor(new Color(0, 102, 0));
+            g.drawString("Play Again", (WIDTH - newMetrics.stringWidth("Play Again"))/2, play.y + 30);
+            ((Graphics2D) g2d).draw(play);
+
+            g.setFont(new Font("Roboto Thin", Font.BOLD,20));
+
+            g.setColor(new Color(144, 1, 1));
+            g.drawString("Press M to leave", (WIDTH - newMetrics.stringWidth("Press M to leave"))/2, 500);
         }	
     }
 
@@ -177,9 +181,8 @@ public class Screen<BufferedImageLoader> extends JPanel implements Runnable, Key
             e.printStackTrace();
         }
     }
-    
 
-    public void run() {		//when the game is running the snake is moving 
+    public void run() {	//when the game is running the snake is moving
         while (running) {
             tick();
             repaint();
@@ -221,5 +224,6 @@ public class Screen<BufferedImageLoader> extends JPanel implements Runnable, Key
     public void keyTyped(KeyEvent arg0) {
     }
 
-
 }
+
+
