@@ -20,7 +20,7 @@ public class BodyPart
     }
 
     public void draw(Graphics g) { // Graphics class to set and fill color to the snake
-        g.setColor(Color.cyan);
+        g.setColor(new Color(168, 102, 8));
         g.fill3DRect(xCoor * width, yCoor * height, width, height, raised);
         //g.setColor(Color.cyan);
         //g.fillRect(xCoor * width + 2, yCoor * height + 2, width -4, height-4);
