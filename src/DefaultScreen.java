@@ -1,188 +1,170 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import javax.imageio.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
 
-public class DefaultScreen<BufferedImageLoader> extends JPanel implements Runnable, KeyListener
+public class DefaultScreen extends JPanel implements Runnable, KeyListener
 {
-	private static final long serialVersionUID = 1L; //used during the deserialization of an object to ensure that a loaded class is compatible with the serialized object
+    public static final int WIDTH = 600, HEIGHT = 600; // Setting width and height of window
 
-    public static final int WIDTH = 600, HEIGHT = 600; // width and height of window
+    private Thread thread; // A thread to be assigned to the application
+    private boolean running = false; // Set initial running value to false
 
-    private Thread thread; // a thread to be assigned to the application
-    private boolean running = false; // to check if it's running
+    private BodyPart body; // Body Part Object
+    private ArrayList<BodyPart> snakey; // A list of BodyPart objects to create the snake
 
-    private BodyPart b; // one body part object
-    private ArrayList<BodyPart> snake; // a list of BodyPart objects to create the snake
+    private Apple apples; // Apple Object
+    private int applesEaten = 0; // Number of eaten apples (the game's score)
+    private ArrayList<Apple> bunch; // An apple bunch
 
-    private Apple apple; // one apple object
-    private int applesEaten = 0;	//number of eaten apples
-    private ArrayList<Apple> apples; // a bunch of apples
+    private Random rand; // Variable for random calculations
 
-    private Random r; // variable for random calculations
-    
-    private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+    private int xCoo = 10, yCoo = 10; // Set initial start coordinates for the snake
+    private int size = 5; // Set initial amount of body parts of the snake
+
+    private boolean right = true, left = false, up = false, down = false; // Starts to the right only
+
+    private int ticks = 0; // Ticks for the speed of the snake
 
 
-    private int xCoor = 10, yCoor = 10; // setting initial start coordinates for snake
-    private int size = 5; // amount of body parts of snake initially
 
-    private boolean right = true, left = false, up = false, down = false; // starts to the right only
+    public DefaultScreen() { // Default Screen constructor
+        setFocusable(true); // Making sure the component is focusable
 
-    private int ticks = 0; // ticks for the speed of the snake
+        addKeyListener(this); // Start receiving user input from the keyboard
+        setPreferredSize(new Dimension(WIDTH, HEIGHT)); // Setting the size of the screen
 
-    public DefaultScreen() { // Screen constructor
-        setFocusable(true); // making sure the component is focusable
-
-        try {
-        	image = ImageIO.read(new File("snakeBground.jpg"));
-        }
-        catch(IOException e)
-        {
-        }
-        
-        addKeyListener(this); // to start receiving user input from the keyboard
-        setPreferredSize(new Dimension(WIDTH, HEIGHT)); // setting the size of the screen
-
-        r = new Random();
-        // snake and apple arraylists are defined
-        snake = new ArrayList<BodyPart>();
-        apples = new ArrayList<Apple>();
+        rand = new Random();
+        // Snake and Apple ArrayLists are defined
+        snakey = new ArrayList<BodyPart>();
+        bunch = new ArrayList<Apple>();
 
         start();
     }
 
-    public void tick() { // tick method
+    public void tick() { // Tick method
 
-        if (snake.size() == 0) {
-            b = new BodyPart(xCoor, yCoor, 22); // creates snake
-            snake.add(b); // adds it to snake arrayList
+        if (snakey.size() == 0) {
+            body = new BodyPart(xCoo, yCoo, 22); // Creates snake
+            snakey.add(body); // Adds it to snake ArrayList
         }
-        if (apples.size() == 0) {
-            int xCoor = r.nextInt(26); // random coordinates for x and y
-            int yCoor = r.nextInt(26);
+        if (bunch.size() == 0) {
+            int xCoo = rand.nextInt(26); // Random coordinates for x and y
+            int yCoo = rand.nextInt(26);
 
-            apple = new Apple(xCoor, yCoor, 22); // same as for snake
-            apples.add(apple);
+            apples = new Apple(xCoo, yCoo, 22); // Creates apples
+            bunch.add(apples); // Adds the apples to apple ArrayList
         }
 
-        for (int i = 0; i < apples.size(); i++) {
-            if (xCoor == apples.get(i).getxCoor() &&
-                    yCoor == apples.get(i).getyCoor()) { // check if the snake's head 
-// coordinates are the same as the apple’s
-                size++; // grow one cube
-                apples.remove(i); // remove the apple
+        for (int i = 0; i < bunch.size(); i++) {
+            if (xCoo == bunch.get(i).getxCoo() &&
+                    yCoo == bunch.get(i).getyCoo()) {
+                // Check if the snake's
+                // head coordinates are the same as the apple’s
+
+                size++; // Grow one cube
+                bunch.remove(i); // Remove the apple
                 i++;
-                applesEaten++; // update the number of eaten apples (score)
+                applesEaten++; // Raise the score
             }
         }
 
-        for (int i = 0; i < snake.size(); i++) {
-            if (xCoor == snake.get(i).getxCoor() &&
-                    yCoor == snake.get(i).getyCoor()) { // if the snake intersects itself, the game is over
-                if (i != snake.size() - 1) { 
+        for (int i = 0; i < snakey.size(); i++) {
+            if (xCoo == snakey.get(i).getxCoo() &&
+                    yCoo == snakey.get(i).getyCoo()) { // The game is over if the snake intersects itself
+                if (i != snakey.size() - 1) {
                     stop();
                 }
             }
         }
-        
-        if (xCoor < 0 || xCoor > 26 || yCoor < 0 || yCoor > 26) { // if the snake goes outside the borders the game stops
+
+        if (xCoo < 0 || xCoo > 26 || yCoo < 0 || yCoo > 26) { // If the snake goes outside the borders the game stops
             stop();
         }
 
         ticks++;
 
-        if (ticks > 800000) { // define the speed of the snake and the direction
-            if (right) xCoor++;
-            if (left) xCoor--;
-            if (up) yCoor--;
-            if (down) yCoor++;
+        if (ticks > 800000) { // Define the speed of the snake and the direction
+            if (right) xCoo++;
+            if (left) xCoo--;
+            if (up) yCoo--;
+            if (down) yCoo++;
 
             ticks = 0;
 
-            b = new BodyPart(xCoor, yCoor, 22);
-            snake.add(b);
+            body = new BodyPart(xCoo, yCoo, 22);
+            snakey.add(body);
 
-            if (snake.size() > size) {
-                snake.remove(0);
+            if (snakey.size() > size) {
+                snakey.remove(0);
             }
         }
 
     }
 
-    public void paint(Graphics g) { // graphic design of the GUI
+    public void paint(Graphics g) { // Graphic design of the GUI
         if (running) {
-        	
-        	g.clearRect(0, 0, WIDTH, HEIGHT);	//set the screen graphics and color
-        	g.setColor(new Color(0, 102, 0));
-        	g.fillRect(0, 0, WIDTH, HEIGHT);
 
-        	for (int i = 0; i < snake.size(); i++) {	//set the snake graphics
-        		snake.get(i).draw(g);
-        	}
-        	for (int i = 0; i < apples.size(); i++) {	//set the apple graphics
-        		apples.get(i).draw(g);
-        	}
-        	
-        	g.setColor(new Color(144, 1, 1));	// add a score and set its color, position and size
-        	g.setFont(new Font ("Roboto Thin", Font.BOLD, 13));
-        	FontMetrics metrics = getFontMetrics(g.getFont());
-        	g.drawString("SCORE: " + applesEaten, (WIDTH - metrics.stringWidth("SCORE: " + applesEaten))/2, 20);
+            g.clearRect(0, 0, WIDTH, HEIGHT);	// Set the screen graphics and color
+            g.setColor(new Color(0, 102, 0));
+            g.fillRect(0, 0, WIDTH, HEIGHT);
+
+            for (int i = 0; i < snakey.size(); i++) {	// Set the snake graphics
+                snakey.get(i).draw(g);
+            }
+            for (int i = 0; i < bunch.size(); i++) {	// Set the apple graphics
+                bunch.get(i).draw(g);
+            }
+
+            g.setColor(new Color(144, 1, 1));	// Add a score and set its color, position, and size
+            g.setFont(new Font ("Roboto Thin", Font.BOLD, 13));
+            FontMetrics metrics = getFontMetrics(g.getFont());
+            g.drawString("SCORE: " + applesEaten, (WIDTH - metrics.stringWidth("SCORE: " + applesEaten))/2, 20);
+
         }
-        
+
         else {
             Graphics g2d = (Graphics2D) g;
 
-        	g.clearRect(0, 0, WIDTH, HEIGHT);	//set the screen to be black when the game is over
+        	g.clearRect(0, 0, WIDTH, HEIGHT);	// Set the screen to be black when the game is over
         	g.fillRect(0, 0, WIDTH, HEIGHT);
         	g.setColor(Color.BLACK);
         	
-        	g.setColor(new Color(144, 1, 1));	//add text for game over and score for the end of the game and set their colors, size and position
+        	g.setColor(new Color(144, 1, 1));	// Add text for game over and score for the end of the game and set their colors, size, and position
         	g.setFont(new Font ("Times New Roman", Font.BOLD, 85));
         	FontMetrics metrics = getFontMetrics(g.getFont());
         	g.drawString("GAME OVER", (WIDTH - metrics.stringWidth("GAME OVER"))/2, 220);
         	g.setFont(new Font ("Times New Roman", Font.BOLD, 75));
         	g.drawString("Score: " + applesEaten, (WIDTH - metrics.stringWidth("Score: " + applesEaten))/2, 300);
 
-            Rectangle play = new Rectangle(WIDTH/4, 370, 290, 50);
 
             g.setFont(new Font("Roboto Thin", Font.BOLD,20));
             FontMetrics newMetrics = getFontMetrics(g.getFont());
 
-            g.setColor(new Color(0, 102, 0));
-            g.drawString("Play Again", (WIDTH - newMetrics.stringWidth("Play Again"))/2, play.y + 30);
-            ((Graphics2D) g2d).draw(play);
-
-            g.setFont(new Font("Roboto Thin", Font.BOLD,20));
-
             g.setColor(new Color(144, 1, 1));
             g.drawString("Press M to leave", (WIDTH - newMetrics.stringWidth("Press M to leave"))/2, 500);
-        }	
+            // Leave the game button text
+        }
     }
 
-    public void start() {	//start the game
+    public void start() {// Starts the game
         running = true;
         thread = new Thread(this);
         thread.start();
     }
 
-    public void stop() {	//stop the game
+    public void stop() { // Stops the game
         running = false;
         try {
             thread.join();
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    public void run() {	//when the game is running the snake is moving
+    public void run() {	// When the game is running the snake is moving
         while (running) {
             tick();
             repaint();
@@ -190,10 +172,10 @@ public class DefaultScreen<BufferedImageLoader> extends JPanel implements Runnab
     }
 
     @Override
-    public void keyPressed(KeyEvent e) { // to monitor the keys pressed
+    public void keyPressed(KeyEvent e) { // Monitors the keys pressed
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_RIGHT && !left) { // checks for direction and if it's previous position isn't 180 degrees of it
-            up = false;
+        if (key == KeyEvent.VK_RIGHT && !left) { // Checks for direction
+        	up = false;
             down = false;
             right = true;
         }
@@ -212,10 +194,8 @@ public class DefaultScreen<BufferedImageLoader> extends JPanel implements Runnab
             right = false;
             down = true;
         }
-        if(key == KeyEvent.VK_M)  // inserting a key to stop the console from running
-        {
-        	System.exit(0);
-        }
+        if(key == KeyEvent.VK_M)  // Inserts a key to stop the console from running
+            System.exit(0);
     }
     @Override
     public void keyReleased(KeyEvent arg0) {
@@ -225,5 +205,3 @@ public class DefaultScreen<BufferedImageLoader> extends JPanel implements Runnab
     }
 
 }
-
-
