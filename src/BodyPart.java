@@ -4,43 +4,41 @@ import java.awt.Graphics;
 public class BodyPart 
 {
 
-    private int xCoor, yCoor, width, height; // x and y coordinates, width and height of bodyPart of snake
-	private boolean raised;
+    private int xCoo, yCoo, w, h; // X and Y coordinates, width and height of bodyPart of snake
+	private boolean raised; // Adding another parameter to make it so that the snak appears kind of 3D
 
-    public BodyPart(int xCoor, int yCoor, int tileSize) { // constructor to initialize the x and y coordinates and the tile size
-        this.xCoor = xCoor;
-        this.yCoor = yCoor;
-        width = tileSize;
-        height = tileSize;
+    public BodyPart(int xCoo, int yCoo, int tileSize) { // Constructor to initialize the x and y coordinates, the tile size and the raised boolean value
+        this.xCoo = xCoo;
+        this.yCoo = yCoo;
+        w = tileSize;
+        h = tileSize;
         raised = true;
     }
 
-    public void tick() { // the speed of the snake
+    public void tick() { // The speed of the snake
 
     }
 
     public void draw(Graphics g) { // Graphics class to set and fill color to the snake
         g.setColor(new Color(168, 102, 8));
-        g.fill3DRect(xCoor * width, yCoor * height, width, height, raised);
-        //g.setColor(Color.cyan);
-        //g.fillRect(xCoor * width + 2, yCoor * height + 2, width -4, height-4);
+        g.fill3DRect(xCoo * w, yCoo * h, w, h, raised);
     }
 
-    // setters and getters for x and y
-    public int getxCoor() {
-        return xCoor;
+    // Setters and getters for x and y
+    public int getxCoo() {
+        return xCoo;
     }
 
-    public void setxCoor(int xCoor) {
-        this.xCoor = xCoor;
+    public void setxCoo(int xCoo) {
+        this.xCoo = xCoo;
     }
 
-    public int getyCoor() {
-        return yCoor;
+    public int getyCoo() {
+        return yCoo;
     }
 
-    public void setyCoor(int yCoor) {
-        this.yCoor = yCoor;
+    public void setyCoo(int yCoo) {
+        this.yCoo = yCoo;
     }
 }
 	
